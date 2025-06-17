@@ -15,7 +15,9 @@ def start():
     menu(engine.home_background)
 
 
-def menu(background):    
+def menu(background):
+    engine.change_music("start_wars_theme")
+    
     width_start_button = 150
     height_start_button  = 40
     width_quit_button = 150
@@ -30,18 +32,20 @@ def menu(background):
     center_position_y_quit = ((engine.game_resolution[1] + height_quit_button) / 2) + 10
 
 
-    startTexto = engine.font.render("Iniciar Game", True, engine.yellow)
+    startTexto = engine.font.render("Iniciar Game", True, engine.white)
     start_text_width , start_text_height = startTexto.get_size()
     center_position_x_start_text = center_position_x_start + (width_start_button - start_text_width) / 2
     center_position_y_start_text = center_position_y_start + (height_start_button - start_text_height) / 2
     
     
-    quitTexto = engine.font.render("Sair do Game", True, engine.yellow)
+    quitTexto = engine.font.render("Sair do Game", True, engine.white)
     quit_text_width , quit_text_height = quitTexto.get_size()
     center_position_x_quit_text = center_position_x_quit + (width_quit_button - quit_text_width) / 2
     center_position_y_quit_text = center_position_y_quit + (height_quit_button - quit_text_height) / 2
 
 
+    startButton = None
+    quitButton = None
     pygame.mouse.set_visible(True)
     while True:   
         for evento in pygame.event.get():
@@ -62,8 +66,7 @@ def menu(background):
                 if startButton.collidepoint(evento.pos):
                     width_start_button = 150
                     height_start_button  = 40
-                    # welcome(colect_name())
-                    welcome("teste")
+                    welcome(colect_name())
                     
                 if quitButton.collidepoint(evento.pos):
                     width_quit_button = 150
@@ -91,23 +94,33 @@ def welcome(nick_name):
     
     box_center_x = engine.game_resolution[0] / 2
     
-    welcomeTxt = engine.font.render(f"Seja bem vindo {nick_name}!!", True, engine.yellow)
+    welcome = f"Seja bem vindo {nick_name}!"
+    objective = "Seu objetio é destruir asteroides e evitar colisões, toda vez que destruí-los será adicinado um ponto ao seu placar."
+    gameplay = "Você utilizará as setas (↑ ← ↓ →) ou W A S D do seu teclado para se movimentar."
+    gameplay_2 = "Utilize o seu mouse para clicar sobre os asteroides e destruí-los."
+    
+    welcomeTxt = engine.font.render(welcome, True, engine.yellow)
     welcomeTxt_width , welcomeTxt_height = welcomeTxt.get_size()
     welcomeTxt_center_x= box_center_x - (welcomeTxt_width / 2)
     welcomeTxt_center_y = (text_spacing * 4)
     
-    loreTxt = engine.font.render("Seu objetio é ultrapassar carros e evitar colisões, toda vez que fizer isso será adicinado um ponto ao placar.", True, engine.yellow)
+    loreTxt = engine.font.render(objective, True, engine.yellow)
     loreTxt_width , loreTxt_height = loreTxt.get_size()
     loreTxt_center_x= box_center_x - (loreTxt_width / 2)
     loreTxt_center_y = welcomeTxt_center_y + text_spacing
     
-    gameplayTxt = engine.font.render("Você utilizará as setas ↑ (cima) ↓ (baixo) ← (esquerda) → (direita) do seu telado para se movimentar.", True, engine.yellow)
+    gameplayTxt = engine.font.render(gameplay, True, engine.yellow)
     gameplay_width , gameplay_height = gameplayTxt.get_size()
     gameplay_center_x= box_center_x - (gameplay_width / 2)
     gameplay_center_y = loreTxt_center_y + text_spacing
     
+    gameplayTxt_2 = engine.font.render(gameplay_2, True, engine.yellow)
+    gameplay_2_width , gameplay_2_height = gameplayTxt_2.get_size()
+    gameplay_2_center_x= box_center_x - (gameplay_2_width / 2)
+    gameplay_2_center_y = gameplay_center_y + text_spacing
     
-    startTxt = engine.font.render("Iniciar", True, engine.yellow)
+    
+    startTxt = engine.font.render("Iniciar", True, engine.white)
     startTxt_width , startTxt_height = startTxt.get_size()
     startTxt_center_x= box_center_x - (startTxt_width / 2)
     startTxt_center_y = gameplay_center_y + (text_spacing * 3)
@@ -117,10 +130,10 @@ def welcome(nick_name):
     start_box_center_x = box_center_x - (start_box_width / 2)
     start_box_center_y = startTxt_center_y - 10
     
-    start_button = None
     first_loop = True
     
-    
+    start_button = None
+
     pygame.mouse.set_visible(True)
     while True:
         for evento in pygame.event.get():
@@ -148,13 +161,14 @@ def welcome(nick_name):
         engine.window.blit(welcomeTxt, (welcomeTxt_center_x, welcomeTxt_center_y))
         engine.window.blit(loreTxt, (loreTxt_center_x, loreTxt_center_y))
         engine.window.blit(gameplayTxt, (gameplay_center_x, gameplay_center_y))
+        engine.window.blit(gameplayTxt_2, (gameplay_2_center_x, gameplay_2_center_y))
         start_button = pygame.draw.rect(engine.window, engine.dark_grey, (start_box_center_x, start_box_center_y, start_box_width, start_box_height), border_radius=15)
         engine.window.blit(startTxt, (startTxt_center_x, startTxt_center_y))
         
         pygame.display.flip()
         
         if(first_loop):
-            iv.engine.say(f"Seja bem vindo {nick_name}!")
+            iv.speak(welcome, objective, gameplay, gameplay_2)
             iv.engine.runAndWait()
             first_loop = False
         
@@ -171,22 +185,28 @@ def colect_name():
     
     box_center_x = engine.game_resolution[0] / 2
     
-    get_nick_txt = engine.font.render("Fale seu nickname em voz alta!", True, engine.yellow)
+    f_1 = "Fale seu nickname em voz alta!"
+    f_3 = f"Se seu nickname estiver correto diga sim."
+    
+    get_nick_txt = engine.font.render(f_1, True, engine.yellow)
     get_nick_txt_width , get_nick_txt_height = get_nick_txt.get_size()
     get_nick_txt_center_x= box_center_x - (get_nick_txt_width / 2)
     get_nick_txt_y = (text_spacing * 4)
     
-    confirm_txt = engine.font.render(f"Se seu nickname estiver correto diga sim.", True, engine.yellow)
+    confirm_txt = engine.font.render(f_3, True, engine.yellow)
     confirm_txt_width , confirm_txt_height = confirm_txt.get_size()
     confirm_txt_center_x= box_center_x - (confirm_txt_width / 2)
-    
+
+
     nick_name = None
     nick_correct = None
     setp = 0
-
-
+    
     pygame.mouse.set_visible(True)
     while True:
+        f_2 = f"Você disse: {nick_name}."
+        f_4 = f"Você disse: {nick_correct}"
+        
         engine.window.fill(engine.white)
         engine.window.blit(engine.home_background, (0,0))        
         for i in range(1, 5):
@@ -196,7 +216,7 @@ def colect_name():
         
         if (nick_name != None):
             setp = 1
-            nick_txt = engine.font.render(f"Você disse: {nick_name}.", True, engine.yellow)
+            nick_txt = engine.font.render(f_2, True, engine.yellow)
             nick_txt_width , nick_txt_height = nick_txt.get_size()
             nick_txt_center_x= box_center_x - (nick_txt_width / 2)
             nick_txt_y = get_nick_txt_y + text_spacing
@@ -204,27 +224,30 @@ def colect_name():
             confirm_txt_y = nick_txt_y + text_spacing
             engine.window.blit(confirm_txt, (confirm_txt_center_x, confirm_txt_y))
             
-            if (nick_correct != None):
+            if nick_correct != None:
                 setp = 2
-                nick_correct_txt = engine.font.render(f"Você disse: {nick_correct}", True, engine.yellow)
-                nick_correct_txt_width , nick_correct_txt_height = nick_txt.get_size()
-                nick_correct_txt_center_x= box_center_x - (nick_correct_txt_width / 2)
-                nick_correct_txt_y = confirm_txt_y + text_spacing
-                engine.window.blit(nick_correct_txt, (nick_correct_txt_center_x, nick_correct_txt_y))
+
+                if nick_correct == "sim":
+                    nick_correct_txt = engine.font.render(f_4, True, engine.yellow)
+                    nick_correct_txt_width , nick_correct_txt_height = nick_txt.get_size()
+                    nick_correct_txt_center_x= box_center_x - (nick_correct_txt_width / 2)
+                    nick_correct_txt_y = confirm_txt_y + text_spacing
+                    engine.window.blit(nick_correct_txt, (nick_correct_txt_center_x, nick_correct_txt_y))
+                else:
+                    setp = 0
         
         
         pygame.display.flip()            
         
         if setp == 0:
-            iv.engine.say("Fale seu nickname em voz alta!")
+            iv.speak(f_1)
             iv.engine.runAndWait()
             nick_name = iv.recognize()
         elif setp == 1:
-            iv.engine.say(f"Você disse: {nick_name}? Se seu nickname estiver correto diga sim")
+            iv.speak(f_2, f_3)
             iv.engine.runAndWait()
             nick_correct = iv.recognize()
         elif setp == 2:
-            nick_correct == "sim"
             return nick_name
             
         engine.clock.tick(engine.clock_tick)
@@ -236,9 +259,13 @@ def play(nick_name):
     max_count = 120
     difficulty = 1
     
-    
     move_x  = 0
     move_y  = 0
+    
+    points = 0
+    
+    is_paused = False
+    pause = False
     
     asteroids: List[Asteroid] = []
     
@@ -250,14 +277,7 @@ def play(nick_name):
         asteroid.set_rotation(random.randint(0, 3))
         asteroids.append(asteroid)
         
-    build_asteroid() 
-    
-    pontos = 0
-    tolerance  = 30
-    
-    is_paused = False
-    pause = False
-    
+    build_asteroid()    
     
     pygame.mouse.set_visible(False)
     while True:
@@ -319,7 +339,6 @@ def play(nick_name):
                 engine.spaceship.set_x(engine.map_limit_x[0])
             elif spaceship_x > engine.map_limit_x[1] - engine.spaceship.resolution[0]:
                 engine.spaceship.set_x(engine.map_limit_x[1] - engine.spaceship.resolution[0])
-                
             
             ## verify map limit y
             if spaceship_y < engine.map_limit_y[0]:
@@ -330,37 +349,43 @@ def play(nick_name):
             spaceship_x, spaceship_y = engine.spaceship.position        
             
             
-            def angle_to_mouse(nave_pos, mouse_pos):
-                dx = mouse_pos[0] - nave_pos[0]
-                dy = mouse_pos[1] - nave_pos[1]
-                angle_rad = math.atan2(-dy, dx)
-                angle_deg = math.degrees(angle_rad)
-                return angle_deg - 90
-
+            ## change spaceship angle
             mouse_pos = pygame.mouse.get_pos()
-            engine.spaceship.set_rotation(angle_to_mouse(engine.spaceship.center, mouse_pos))
+            dx = mouse_pos[0] - engine.spaceship.center[0]
+            dy = mouse_pos[1] - engine.spaceship.center[1]
+            
+            angle_rad = math.atan2(-dy, dx)
+            angle_deg = math.degrees(angle_rad)
+            spaceship_angle =  angle_deg - 90
+            
+            engine.spaceship.set_rotation(spaceship_angle)
             
             
-            ## get colisor
+            ## get spaceship colisor
             engine.spaceship.colisor_x = list(range(int(spaceship_x), int(spaceship_x + engine.spaceship.width)))
             engine.spaceship.colisor_y = list(range(int(spaceship_y), int(spaceship_y + engine.spaceship.height)))
             
             
+            ## increment levels
             count += (1 * difficulty)
-            difficulty += 0.0005
+            difficulty += 0.005
             if (count >= max_count):
                 count = 0
                 build_asteroid()
             
             
+            ## asteroids logics
             for asteroid in asteroids: 
                 asteroid_x, asteroid_y = asteroid.position
                 asteroid.set_y(asteroid_y + difficulty) 
                 asteroid_y = asteroid.get_y()
                 
+                 ## get asteroid colisor
                 asteroid.colisor_x = list(range(int(asteroid_x), int(asteroid_x + asteroid.width)))
                 asteroid.colisor_y = list(range(int(asteroid_y), int(asteroid_y + asteroid.height)))
                 
+                
+                ## verify click on asteroid
                 if (mouse_click != None):                   
                     click_x, click_y = mouse_click
                     rel_x = int(click_x - asteroid.rect.x)
@@ -371,23 +396,24 @@ def play(nick_name):
 
                         if mask.get_at((rel_x, rel_y)):
                             asteroids.remove(asteroid)
-                            pontos += 10
-                            pygame.mixer.Sound.play(engine.explosion)
+                            points += 1
+                            pygame.mixer.Sound.play(engine.blaster_cannon)
                             continue
                     
-            
+                
+                ## verify colision with asteroid
                 spaceship_mask, offset = engine.spaceship.get_mask_and_offset(asteroid)
                 asteroid_mask = pygame.mask.from_surface(asteroid.sprite)
                 
                 if engine.spaceship.rect.colliderect(asteroid.rect):
                     if spaceship_mask.overlap(asteroid_mask, offset):
                         pygame.mixer.Sound.play(engine.explosion)
-                        writeData(nick_name, pontos)
+                        writeData(nick_name, points)
                         game_over()
             
             
             ## write points infos 
-            text_points = engine.font.render("Pontos: " + str(pontos), True, engine.white)
+            text_points = engine.font.render("Pontos: " + str(points), True, engine.white)
             text_points_width = (text_points.get_size()[0]) + 60
             
             text_pause = engine.font_small.render("Press Space to Pause Game", True, engine.white)
@@ -404,6 +430,7 @@ def play(nick_name):
             crosshair_postion = (mouse_x - (crosshair_width / 2), mouse_y - (crosshair_height / 2))
             
             
+            ## draw
             engine.window.fill(engine.white)    
             engine.window.blit(engine.background, (0, 0))
             engine.window.blit(engine.spaceship.sprite, engine.spaceship.rect)
@@ -427,14 +454,15 @@ def ajust_str(s, max_len, space):
 
         
 def game_over():
+    engine.change_music("imperial_march")
     placar_font = pygame.font.SysFont("Courier New", 20)
     
     engine.window.fill(engine.white)  
     engine.window.blit(engine.endgame_background, (0, 0))
     
-    for i in range(1, 5):
+    for i in range(1, 3):
         engine.window.blit(engine.filter_transparent, (0, 0))
-    
+        
     
     box_center_x = engine.game_resolution[0] / 2
     text_spacing = 50
@@ -472,6 +500,8 @@ def game_over():
     goto_to_menu_boxr_y = goto_to_menu_y - 10
 
 
+    goto_menu_button = None
+    
     pygame.mouse.set_visible(True)
     while True:
         for evento in pygame.event.get():

@@ -27,7 +27,7 @@ map_limit_y: Tuple[int, int] = (50, game_resolution[1] - 50)
 
 # backgrounds
 home_background = pygame.transform.smoothscale(pygame.image.load("assets/home_background.jpg"), game_resolution)
-endgame_background = pygame.transform.smoothscale(pygame.image.load("assets/endgame_background.jpg"), game_resolution)
+endgame_background = pygame.transform.smoothscale(pygame.image.load("assets/endgame_background.png"), game_resolution)
 background = pygame.transform.smoothscale(pygame.image.load("assets/space.png").convert(), game_resolution)
 
 
@@ -45,19 +45,25 @@ init_axle_y: int = -asteroid_res[1]
 asteroids_imgs = ("assets/asteroid1.png", "assets/asteroid2.png")
 
 ## sounds
-start_wars_theme_ref = "assets/star_wars_theme.mp3"
-imperial_march_ref = "assets/crash.mp3"
+musics = { 
+    "start_wars_theme": "assets/star_wars_theme.mp3",
+    "imperial_march": "assets/imperial_march.mp3"
+}
 
-pygame.mixer.music.load(start_wars_theme_ref)
-pygame.mixer.music.set_volume(0.2)
-pygame.mixer.music.fadeout(3000)
-pygame.mixer.music.play(-1, fade_ms=2000)
+def change_music(ref):
+    pygame.mixer.music.load(musics[ref])
+    pygame.mixer.music.set_volume(0.2)
+    pygame.mixer.music.fadeout(3000)
+    pygame.mixer.music.play(-1, fade_ms=2000)
 
 r2d2 = pygame.mixer.Sound("assets/r2d2_sound.mp3")
-r2d2.set_volume(0.05)
+r2d2.set_volume(0.1)
+
+blaster_cannon = pygame.mixer.Sound("assets/mf_blaster_cannon.mp3")
+blaster_cannon.set_volume(0.5)
 
 explosion = pygame.mixer.Sound("assets/explosion.mp3")
-explosion.set_volume(0.05)
+explosion.set_volume(0.1)
 
 
 ## fonts
