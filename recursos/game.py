@@ -1,13 +1,15 @@
-import pygame
 import math
 import random
 from typing import List
-from recursos.asteroid import Asteroid
-from recursos.functions import writeData, getData
-import recursos.input_voice as iv
 
-
+import pygame
 pygame.init()
+
+import recursos.input_voice as iv
+from recursos.spaceship import Spaceship
+from recursos.asteroid import Asteroid
+from recursos.laser import Laser
+from recursos.functions import writeData, getData
 import recursos.engine as engine
 
 
@@ -66,7 +68,8 @@ def menu(background):
                 if startButton.collidepoint(evento.pos):
                     width_start_button = 150
                     height_start_button  = 40
-                    welcome(colect_name())
+                    # welcome(colect_name())
+                    welcome("teste")
                     
                 if quitButton.collidepoint(evento.pos):
                     width_quit_button = 150
@@ -87,92 +90,6 @@ def menu(background):
         
         pygame.display.flip()
         engine.clock.tick(60)
-        
-
-def welcome(nick_name):   
-    text_spacing = 50
-    
-    box_center_x = engine.game_resolution[0] / 2
-    
-    welcome = f"Seja bem vindo {nick_name}!"
-    objective = "Seu objetio é destruir asteroides e evitar colisões, toda vez que destruí-los será adicinado um ponto ao seu placar."
-    gameplay = "Você utilizará as setas (↑ ← ↓ →) ou W A S D do seu teclado para se movimentar."
-    gameplay_2 = "Utilize o seu mouse para clicar sobre os asteroides e destruí-los."
-    
-    welcomeTxt = engine.font.render(welcome, True, engine.yellow)
-    welcomeTxt_width , welcomeTxt_height = welcomeTxt.get_size()
-    welcomeTxt_center_x= box_center_x - (welcomeTxt_width / 2)
-    welcomeTxt_center_y = (text_spacing * 4)
-    
-    loreTxt = engine.font.render(objective, True, engine.yellow)
-    loreTxt_width , loreTxt_height = loreTxt.get_size()
-    loreTxt_center_x= box_center_x - (loreTxt_width / 2)
-    loreTxt_center_y = welcomeTxt_center_y + text_spacing
-    
-    gameplayTxt = engine.font.render(gameplay, True, engine.yellow)
-    gameplay_width , gameplay_height = gameplayTxt.get_size()
-    gameplay_center_x= box_center_x - (gameplay_width / 2)
-    gameplay_center_y = loreTxt_center_y + text_spacing
-    
-    gameplayTxt_2 = engine.font.render(gameplay_2, True, engine.yellow)
-    gameplay_2_width , gameplay_2_height = gameplayTxt_2.get_size()
-    gameplay_2_center_x= box_center_x - (gameplay_2_width / 2)
-    gameplay_2_center_y = gameplay_center_y + text_spacing
-    
-    
-    startTxt = engine.font.render("Iniciar", True, engine.white)
-    startTxt_width , startTxt_height = startTxt.get_size()
-    startTxt_center_x= box_center_x - (startTxt_width / 2)
-    startTxt_center_y = gameplay_center_y + (text_spacing * 3)
-    
-    start_box_width = startTxt_width + 100
-    start_box_height = startTxt_height + 20
-    start_box_center_x = box_center_x - (start_box_width / 2)
-    start_box_center_y = startTxt_center_y - 10
-    
-    first_loop = True
-    
-    start_button = None
-
-    pygame.mouse.set_visible(True)
-    while True:
-        for evento in pygame.event.get():
-            if evento.type == pygame.QUIT:
-                quit()
-                
-            if start_button != None:
-                if evento.type == pygame.MOUSEBUTTONDOWN:
-                    if start_button.collidepoint(evento.pos):
-                        start_box_width -= 10
-                        start_box_height -= 5
-
-                    
-                elif evento.type == pygame.MOUSEBUTTONUP:
-                    if start_button.collidepoint(evento.pos):
-                        start_box_width += 10
-                        start_box_height += 5
-                        play(nick_name)
-        
-        engine.window.fill(engine.white)
-        engine.window.blit(engine.home_background, (0,0))        
-        for i in range(1, 3):
-            engine.window.blit(engine.filter_transparent, (0, 0))
-            
-        engine.window.blit(welcomeTxt, (welcomeTxt_center_x, welcomeTxt_center_y))
-        engine.window.blit(loreTxt, (loreTxt_center_x, loreTxt_center_y))
-        engine.window.blit(gameplayTxt, (gameplay_center_x, gameplay_center_y))
-        engine.window.blit(gameplayTxt_2, (gameplay_2_center_x, gameplay_2_center_y))
-        start_button = pygame.draw.rect(engine.window, engine.dark_grey, (start_box_center_x, start_box_center_y, start_box_width, start_box_height), border_radius=15)
-        engine.window.blit(startTxt, (startTxt_center_x, startTxt_center_y))
-        
-        pygame.display.flip()
-        
-        if(first_loop):
-            iv.speak(welcome, objective, gameplay, gameplay_2)
-            iv.engine.runAndWait()
-            first_loop = False
-        
-        engine.clock.tick(engine.clock_tick)
 
 
 def colect_name():
@@ -227,31 +144,118 @@ def colect_name():
             if nick_correct != None:
                 setp = 2
 
-                if nick_correct == "sim":
+                if nick_correct != "sim":
                     nick_correct_txt = engine.font.render(f_4, True, engine.yellow)
                     nick_correct_txt_width , nick_correct_txt_height = nick_txt.get_size()
                     nick_correct_txt_center_x= box_center_x - (nick_correct_txt_width / 2)
                     nick_correct_txt_y = confirm_txt_y + text_spacing
                     engine.window.blit(nick_correct_txt, (nick_correct_txt_center_x, nick_correct_txt_y))
-                else:
-                    setp = 0
+                    
+                    setp = 3
         
         
         pygame.display.flip()            
         
         if setp == 0:
             iv.speak(f_1)
-            iv.engine.runAndWait()
             nick_name = iv.recognize()
         elif setp == 1:
             iv.speak(f_2, f_3)
-            iv.engine.runAndWait()
             nick_correct = iv.recognize()
         elif setp == 2:
             return nick_name
+        elif setp == 3:
+            iv.speak(f_4)
+            setp = 0
+            nick_name = None
+            nick_correct = None
             
         engine.clock.tick(engine.clock_tick)
     
+
+def welcome(nick_name):   
+    text_spacing = 50
+    
+    box_center_x = engine.game_resolution[0] / 2
+    
+    welcome = f"Seja bem vindo {nick_name}!"
+    objective = "Seu objetio é destruir asteroides e evitar colisões, toda vez que destruí-los será adicinado um ponto ao seu placar."
+    gameplay = "Você utilizará as setas (↑ ← ↓ →) ou W A S D do seu teclado para se movimentar."
+    gameplay_2 = "Utilize o seu mouse para clicar sobre os asteroides e destruí-los."
+    
+    welcomeTxt = engine.font.render(welcome, True, engine.yellow)
+    welcomeTxt_width , welcomeTxt_height = welcomeTxt.get_size()
+    welcomeTxt_center_x= box_center_x - (welcomeTxt_width / 2)
+    welcomeTxt_center_y = (text_spacing * 4)
+    
+    loreTxt = engine.font.render(objective, True, engine.yellow)
+    loreTxt_width , loreTxt_height = loreTxt.get_size()
+    loreTxt_center_x= box_center_x - (loreTxt_width / 2)
+    loreTxt_center_y = welcomeTxt_center_y + text_spacing
+    
+    gameplayTxt = engine.font.render(gameplay, True, engine.yellow)
+    gameplay_width , gameplay_height = gameplayTxt.get_size()
+    gameplay_center_x= box_center_x - (gameplay_width / 2)
+    gameplay_center_y = loreTxt_center_y + text_spacing
+    
+    gameplayTxt_2 = engine.font.render(gameplay_2, True, engine.yellow)
+    gameplay_2_width , gameplay_2_height = gameplayTxt_2.get_size()
+    gameplay_2_center_x= box_center_x - (gameplay_2_width / 2)
+    gameplay_2_center_y = gameplay_center_y + text_spacing
+    
+    
+    startTxt = engine.font.render("Iniciar", True, engine.white)
+    startTxt_width , startTxt_height = startTxt.get_size()
+    startTxt_center_x= box_center_x - (startTxt_width / 2)
+    startTxt_center_y = gameplay_center_y + (text_spacing * 3)
+    
+    start_box_width = startTxt_width + 100
+    start_box_height = startTxt_height + 20
+    start_box_center_x = box_center_x - (start_box_width / 2)
+    start_box_center_y = startTxt_center_y - 10
+    
+    first_loop = True
+    start_button = None
+    
+    pygame.mouse.set_visible(True)
+    while True:
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                quit()
+                
+            if start_button != None:
+                if evento.type == pygame.MOUSEBUTTONDOWN:
+                    if start_button.collidepoint(evento.pos):
+                        start_box_width -= 10
+                        start_box_height -= 5
+
+                    
+                elif evento.type == pygame.MOUSEBUTTONUP:
+                    if start_button.collidepoint(evento.pos):
+                        start_box_width += 10
+                        start_box_height += 5
+                        iv.engine.stop()
+                        play(nick_name)
+        
+        engine.window.fill(engine.white)
+        engine.window.blit(engine.home_background, (0,0))        
+        for i in range(1, 3):
+            engine.window.blit(engine.filter_transparent, (0, 0))
+            
+        engine.window.blit(welcomeTxt, (welcomeTxt_center_x, welcomeTxt_center_y))
+        engine.window.blit(loreTxt, (loreTxt_center_x, loreTxt_center_y))
+        engine.window.blit(gameplayTxt, (gameplay_center_x, gameplay_center_y))
+        engine.window.blit(gameplayTxt_2, (gameplay_2_center_x, gameplay_2_center_y))
+        start_button = pygame.draw.rect(engine.window, engine.dark_grey, (start_box_center_x, start_box_center_y, start_box_width, start_box_height), border_radius=15)
+        engine.window.blit(startTxt, (startTxt_center_x, startTxt_center_y))
+        
+        pygame.display.flip()
+        
+        if(first_loop):
+            iv.speak(welcome, objective, gameplay, gameplay_2, is_async=True)
+            first_loop = False
+        
+        engine.clock.tick(engine.clock_tick)
 
 
 def play(nick_name):
@@ -267,15 +271,25 @@ def play(nick_name):
     is_paused = False
     pause = False
     
+    spaceship = Spaceship()
+    
     asteroids: List[Asteroid] = []
     
     def build_asteroid():
         r_path = engine.asteroids_imgs[random.randint(0, 1)]
         r_axle_x = random.randint(engine.asteroids_range_x[0], engine.asteroids_range_x[1])
-        postion = (r_axle_x, 100)
+        postion = (r_axle_x, - engine.asteroid_res[0])
         asteroid =  Asteroid(path=r_path, resolution=engine.asteroid_res, position=postion)
         asteroid.set_rotation(random.randint(0, 3))
         asteroids.append(asteroid)
+        
+        
+    lasers: List[Laser] = []   
+        
+    def shoot_laser(mouse_click):
+        laser = Laser(start_pos=(spaceship.rect.centerx, spaceship.rect.centery), target_pos=mouse_click)
+        lasers.append(laser)
+        pygame.mixer.Sound.play(engine.blaster_cannon)
         
     build_asteroid()    
     
@@ -306,6 +320,7 @@ def play(nick_name):
             elif evento.type == pygame.MOUSEBUTTONUP:
                 if evento.button == 1:
                     mouse_click = pygame.mouse.get_pos()
+                    shoot_laser(mouse_click)
                     
             elif evento.type == pygame.KEYDOWN and evento.key == (pygame.K_SPACE):
                 if is_paused:
@@ -328,42 +343,20 @@ def play(nick_name):
                 pause = False
         
         
-        else:
-            spaceship_x, spaceship_y = engine.spaceship.position
-            engine.spaceship.set_x(spaceship_x + move_x)
-            engine.spaceship.set_y(spaceship_y + move_y)                        
-            
-            
-            ## verify map limit x
-            if spaceship_x < engine.map_limit_x[0]:
-                engine.spaceship.set_x(engine.map_limit_x[0])
-            elif spaceship_x > engine.map_limit_x[1] - engine.spaceship.resolution[0]:
-                engine.spaceship.set_x(engine.map_limit_x[1] - engine.spaceship.resolution[0])
-            
-            ## verify map limit y
-            if spaceship_y < engine.map_limit_y[0]:
-                engine.spaceship.set_y(engine.map_limit_y[0])
-            elif spaceship_y > engine.map_limit_y[1] - engine.spaceship.resolution[1]:
-                engine.spaceship.set_y(engine.map_limit_y[1] - engine.spaceship.resolution[1])
-
-            spaceship_x, spaceship_y = engine.spaceship.position        
-            
+        else:                    
+            spaceship.move_spaceship((move_x, move_y))
+                        
             
             ## change spaceship angle
             mouse_pos = pygame.mouse.get_pos()
-            dx = mouse_pos[0] - engine.spaceship.center[0]
-            dy = mouse_pos[1] - engine.spaceship.center[1]
+            dx = mouse_pos[0] - spaceship.center[0]
+            dy = mouse_pos[1] - spaceship.center[1]
             
             angle_rad = math.atan2(-dy, dx)
             angle_deg = math.degrees(angle_rad)
             spaceship_angle =  angle_deg - 90
             
-            engine.spaceship.set_rotation(spaceship_angle)
-            
-            
-            ## get spaceship colisor
-            engine.spaceship.colisor_x = list(range(int(spaceship_x), int(spaceship_x + engine.spaceship.width)))
-            engine.spaceship.colisor_y = list(range(int(spaceship_y), int(spaceship_y + engine.spaceship.height)))
+            spaceship.set_rotation(spaceship_angle)
             
             
             ## increment levels
@@ -375,37 +368,32 @@ def play(nick_name):
             
             
             ## asteroids logics
-            for asteroid in asteroids: 
+            for asteroid in asteroids[:]: 
                 asteroid_x, asteroid_y = asteroid.position
                 asteroid.set_y(asteroid_y + difficulty) 
                 asteroid_y = asteroid.get_y()
                 
-                 ## get asteroid colisor
-                asteroid.colisor_x = list(range(int(asteroid_x), int(asteroid_x + asteroid.width)))
-                asteroid.colisor_y = list(range(int(asteroid_y), int(asteroid_y + asteroid.height)))
                 
-                
-                ## verify click on asteroid
-                if (mouse_click != None):                   
-                    click_x, click_y = mouse_click
-                    rel_x = int(click_x - asteroid.rect.x)
-                    rel_y = int(click_y - asteroid.rect.y)
+                ## shoots lasers colision
+                for laser in lasers[:]:
+                    rel_x = int(laser.x - asteroid.rect.x)
+                    rel_y = int(laser.y - asteroid.rect.y)
 
                     if 0 <= rel_x < asteroid.rect.width and 0 <= rel_y < asteroid.rect.height:
                         mask = pygame.mask.from_surface(asteroid.sprite)
-
                         if mask.get_at((rel_x, rel_y)):
                             asteroids.remove(asteroid)
+                            lasers.remove(laser)
                             points += 1
-                            pygame.mixer.Sound.play(engine.blaster_cannon)
-                            continue
-                    
+                            pygame.mixer.Sound.play(engine.explosion)
+                            break
+                        
                 
                 ## verify colision with asteroid
-                spaceship_mask, offset = engine.spaceship.get_mask_and_offset(asteroid)
+                spaceship_mask, offset = spaceship.get_mask_and_offset(asteroid)
                 asteroid_mask = pygame.mask.from_surface(asteroid.sprite)
                 
-                if engine.spaceship.rect.colliderect(asteroid.rect):
+                if spaceship.rect.colliderect(asteroid.rect):
                     if spaceship_mask.overlap(asteroid_mask, offset):
                         pygame.mixer.Sound.play(engine.explosion)
                         writeData(nick_name, points)
@@ -413,10 +401,10 @@ def play(nick_name):
             
             
             ## write points infos 
-            text_points = engine.font.render("Pontos: " + str(points), True, engine.white)
+            text_points = engine.font.render("Pontos: " + str(points), True, engine.yellow)
             text_points_width = (text_points.get_size()[0]) + 60
             
-            text_pause = engine.font_small.render("Press Space to Pause Game", True, engine.white)
+            text_pause = engine.font_small.render("Press Space to Pause Game", True, engine.yellow)
             text_pause_width = (text_points.get_size()[0])
             
             label_width = text_points_width + text_pause_width + 52
@@ -433,9 +421,19 @@ def play(nick_name):
             ## draw
             engine.window.fill(engine.white)    
             engine.window.blit(engine.background, (0, 0))
-            engine.window.blit(engine.spaceship.sprite, engine.spaceship.rect)
+            engine.window.blit(spaceship.sprite, spaceship.rect)
+            
+            for laser in lasers[:]:
+                laser.update()
+                laser.draw(engine.window)
+
+                if not (0 <= laser.x <= engine.game_resolution[0] and 0 <= laser.y <= engine.game_resolution[1]):
+                    lasers.remove(laser)
+            
             for asteroid in asteroids:
                 engine.window.blit(asteroid.sprite, asteroid.rect)
+                
+                    
             engine.window.blit(label_point, (5, 11))
             engine.window.blit(text_points, (15,15))
             engine.window.blit(text_pause, (text_points_width, 25))
@@ -460,7 +458,7 @@ def game_over():
     engine.window.fill(engine.white)  
     engine.window.blit(engine.endgame_background, (0, 0))
     
-    for i in range(1, 3):
+    for i in range(1, 4):
         engine.window.blit(engine.filter_transparent, (0, 0))
         
     
@@ -504,6 +502,10 @@ def game_over():
     
     pygame.mouse.set_visible(True)
     while True:
+        
+        goto_menu_button = pygame.draw.rect(engine.window, engine.white, (goto_to_menu_box_x, goto_to_menu_boxr_y, goto_to_menu_box_width, goto_to_menu_box_height), border_radius=15)
+        engine.window.blit(goto_to_menu_txt, (goto_to_menu_x, goto_to_menu_y))
+        
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 quit()
@@ -519,9 +521,6 @@ def game_over():
                     goto_to_menu_box_width += 10
                     goto_to_menu_box_height += 5
                     menu(engine.home_background)
-        
-        goto_menu_button = pygame.draw.rect(engine.window, engine.white, (goto_to_menu_box_x, goto_to_menu_boxr_y, goto_to_menu_box_width, goto_to_menu_box_height), border_radius=15)
-        engine.window.blit(goto_to_menu_txt, (goto_to_menu_x, goto_to_menu_y))
         
         pygame.display.flip()
        

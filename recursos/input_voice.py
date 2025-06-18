@@ -1,9 +1,10 @@
 import speech_recognition as sr
 import pyttsx3
-
+import threading
 
 engine = pyttsx3.init()
 recognizer = sr.Recognizer()
+
 
 def recognize():
     with sr.Microphone() as fonte:
@@ -12,13 +13,21 @@ def recognize():
     try:
         return recognizer.recognize_google(audio, language="pt-BR")
     except sr.UnknownValueError:
-        engine.say("Não foi possível entender o áudio")
+        speak("Não foi possível entender o áudio")
     except sr.RequestError as e:
-        engine.say(f"Erro na requisição: {e}")
+        speak(f"Erro na requisição: {e}")
 
-def speak(*texts):
-    f_text = ""
-    for text in texts:
-        f_text = f_text + " " + text
+def speak(*texts, is_async = False):   
+    def speak_blocking():
+        text = " ".join(texts)
+        engine.say(text)
         
-    engine.say(f_text)
+        if engine._inLoop:
+            engine.endLoop()
+
+        engine.runAndWait()
+        
+    if is_async:
+        return threading.Thread(target=speak_blocking, daemon=True).start()
+
+    speak_blocking(texts)

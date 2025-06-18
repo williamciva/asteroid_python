@@ -9,9 +9,6 @@ class Sprite:
             "right": 270
         }
         
-        self.colisor_x = []
-        self.colisor_y = []
-        
         self.path = path
         self.resolution = resolution
         self.width = resolution[0]
@@ -41,10 +38,17 @@ class Sprite:
     def __calculate_center(self):
         self.center = (self.__x, self.__y)
         
+    def __calculate_mask(self):
+        self.mask = pygame.mask.from_surface(self.sprite)
+        bounding_rects = self.mask.get_bounding_rects()
+        if bounding_rects:
+            self.visible_rect = bounding_rects[0]
+        else:
+            self.visible_rect = self.rect
+        
     def get_mask_and_offset(self, other_sprite):
-        mask = pygame.mask.from_surface(self.sprite)
         offset = (int(other_sprite.rect.x - self.rect.x), int(other_sprite.rect.y - self.rect.y))
-        return mask, offset
+        return self.mask, offset
 
     def get_x(self):
         return self.__x
@@ -55,21 +59,23 @@ class Sprite:
     def set_orientation(self, orientation):
         self.sprite = pygame.transform.rotate(self.original_sprite, self.__orientations[orientation])
         self.__calculate_rect()
-
+        self.__calculate_mask()
     
     def set_rotation(self, angle):
         self.sprite = pygame.transform.rotate(self.original_sprite, angle)
-        self.__calculate_rect()
-           
+        self.__calculate_rect() 
+        self.__calculate_mask()
         
     def set_x(self, pos):
         self.__x = pos
         self.__calculate_postion()
         self.__calculate_center()
         self.__calculate_rect()
+        self.__calculate_mask()
         
     def set_y(self, pos):
         self.__y = pos
         self.__calculate_postion()
         self.__calculate_center()
         self.__calculate_rect()
+        self.__calculate_mask()

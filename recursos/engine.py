@@ -1,6 +1,6 @@
 import pygame
 from typing import Tuple
-from recursos.spaceship import Spaceship
+
 
 ## engine
 game_resolution: Tuple[int, int] = (1000, 700)
@@ -21,21 +21,14 @@ crosshair = pygame.image.load("assets/crosshair.png").convert_alpha()
 
 
 ## map
-map_limit_x: Tuple[int, int]= (50, game_resolution[0] - 50)
-map_limit_y: Tuple[int, int] = (50, game_resolution[1] - 50)
+map_limit_x: Tuple[int, int]= (10, game_resolution[0] - 10)
+map_limit_y: Tuple[int, int] = (10, game_resolution[1] - 10)
 
 
 # backgrounds
 home_background = pygame.transform.smoothscale(pygame.image.load("assets/home_background.jpg"), game_resolution)
 endgame_background = pygame.transform.smoothscale(pygame.image.load("assets/endgame_background.png"), game_resolution)
-background = pygame.transform.smoothscale(pygame.image.load("assets/space.png").convert(), game_resolution)
-
-
-## spaceship
-spaceship_res: Tuple[int, int] = (150, 150)
-spaceship_x: Tuple[int, int] = (game_resolution[0] / 2) - (spaceship_res[0] / 2)
-spaceship_y: Tuple[int, int] = map_limit_x[1]
-spaceship = Spaceship(path="assets/mileniumfalcon.png", resolution=spaceship_res, position = (spaceship_x, spaceship_y))
+background = pygame.transform.smoothscale(pygame.image.load("assets/space.jpeg").convert(), game_resolution)
 
 
 ## asteroids
