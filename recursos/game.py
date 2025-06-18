@@ -182,7 +182,7 @@ def welcome(nick_name):
     box_center_x = engine.game_resolution[0] / 2
     
     welcome = f"Seja bem vindo {nick_name}!"
-    objective = "Seu objetivo é destruir asteroides e evitar colisões, toda vez que destruí-los será adicinado um ponto ao seu placar."
+    objective = "Seu objetivo é destruir asteroides e evitar colisões, toda vez que destruí-los será adicionado um ponto ao seu placar."
     gameplay = "Você utilizará as setas (↑ ← ↓ →) ou W A S D do seu teclado para se movimentar."
     gameplay_2 = "Utilize o seu mouse atirar lasers contra os asteroides e destruí-los."
     
