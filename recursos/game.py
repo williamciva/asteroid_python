@@ -73,7 +73,7 @@ def menu(background):
                 if startButton.collidepoint(evento.pos):
                     width_start_button = 150
                     height_start_button  = 40
-                    welcome("teste")
+                    welcome(colect_name())
                     
                 if quitButton.collidepoint(evento.pos):
                     width_quit_button = 150
