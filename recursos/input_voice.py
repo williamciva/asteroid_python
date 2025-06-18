@@ -1,6 +1,7 @@
 import speech_recognition as sr
 import pyttsx3
 import threading
+import time
 
 engine = pyttsx3.init()
 recognizer = sr.Recognizer()
@@ -17,7 +18,14 @@ def recognize():
     except sr.RequestError as e:
         speak(f"Erro na requisição: {e}")
 
-def speak(*texts, is_async = False):   
+
+def restart_engine():
+    global engine
+    engine.stop()
+    engine = pyttsx3.Engine()
+        
+
+def speak(*texts, is_async = False):
     def speak_blocking():
         text = " ".join(texts)
         engine.say(text)
@@ -30,4 +38,4 @@ def speak(*texts, is_async = False):
     if is_async:
         return threading.Thread(target=speak_blocking, daemon=True).start()
 
-    speak_blocking(texts)
+    speak_blocking()

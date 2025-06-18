@@ -45,12 +45,17 @@ def menu(background):
     center_position_x_quit_text = center_position_x_quit + (width_quit_button - quit_text_width) / 2
     center_position_y_quit_text = center_position_y_quit + (height_quit_button - quit_text_height) / 2
 
-
+    events = []
     startButton = None
     quitButton = None
     pygame.mouse.set_visible(True)
-    while True:   
-        for evento in pygame.event.get():
+    while True:
+        try:
+            events = pygame.event.get()
+        except Exception as e:
+            print(e)
+            
+        for evento in events:
             if evento.type == pygame.QUIT:
                 quit()
                 
@@ -74,7 +79,6 @@ def menu(background):
                     width_quit_button = 150
                     height_quit_button  = 40
                     quit()
-                    
 
         engine.window.fill(engine.white)
         engine.window.blit(background, (0,0))
@@ -233,7 +237,7 @@ def welcome(nick_name):
                     if start_button.collidepoint(evento.pos):
                         start_box_width += 10
                         start_box_height += 5
-                        iv.engine.stop()
+                        iv.restart_engine()
                         play(nick_name)
         
         engine.window.fill(engine.white)
