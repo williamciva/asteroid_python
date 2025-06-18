@@ -68,8 +68,7 @@ def menu(background):
                 if startButton.collidepoint(evento.pos):
                     width_start_button = 150
                     height_start_button  = 40
-                    # welcome(colect_name())
-                    welcome("teste")
+                    welcome(colect_name())
                     
                 if quitButton.collidepoint(evento.pos):
                     width_quit_button = 150
@@ -272,26 +271,14 @@ def play(nick_name):
     pause = False
     
     spaceship = Spaceship()
-    
-    asteroids: List[Asteroid] = []
-    
-    def build_asteroid():
-        r_path = engine.asteroids_imgs[random.randint(0, 1)]
-        r_axle_x = random.randint(engine.asteroids_range_x[0], engine.asteroids_range_x[1])
-        postion = (r_axle_x, - engine.asteroid_res[0])
-        asteroid =  Asteroid(path=r_path, resolution=engine.asteroid_res, position=postion)
-        asteroid.set_rotation(random.randint(0, 3))
-        asteroids.append(asteroid)
-        
-        
+    asteroids: List[Asteroid] = [Asteroid.build_random()]        
     lasers: List[Laser] = []   
         
     def shoot_laser(mouse_click):
         laser = Laser(start_pos=(spaceship.rect.centerx, spaceship.rect.centery), target_pos=mouse_click)
         lasers.append(laser)
         pygame.mixer.Sound.play(engine.blaster_cannon)
-        
-    build_asteroid()    
+ 
     
     pygame.mouse.set_visible(False)
     while True:
@@ -301,22 +288,25 @@ def play(nick_name):
             
             if evento.type == pygame.QUIT:
                 quit()
-            elif evento.type == pygame.KEYDOWN and (evento.key == pygame.K_RIGHT or evento.key == pygame.K_d):
-                move_x = 15
-            elif evento.type == pygame.KEYDOWN and (evento.key == pygame.K_LEFT or evento.key == pygame.K_a):
-                move_x = -15
+                
             elif evento.type == pygame.KEYUP and (evento.key == pygame.K_RIGHT or evento.key == pygame.K_d):
                 move_x = 0
             elif evento.type == pygame.KEYUP and (evento.key == pygame.K_LEFT or evento.key == pygame.K_a):
                 move_x = 0
-            elif evento.type == pygame.KEYDOWN and (evento.key == pygame.K_UP or evento.key == pygame.K_w):
-                move_y = -15
-            elif evento.type == pygame.KEYDOWN and (evento.key == pygame.K_DOWN or evento.key == pygame.K_s):
-                move_y = 15
             elif evento.type == pygame.KEYUP and (evento.key == pygame.K_UP or evento.key == pygame.K_w):
                 move_y = 0
             elif evento.type == pygame.KEYUP and (evento.key == pygame.K_DOWN or evento.key == pygame.K_s):
                 move_y = 0
+                
+            elif evento.type == pygame.KEYDOWN and (evento.key == pygame.K_RIGHT or evento.key == pygame.K_d):
+                move_x = 15
+            elif evento.type == pygame.KEYDOWN and (evento.key == pygame.K_LEFT or evento.key == pygame.K_a):
+                move_x = -15
+            elif evento.type == pygame.KEYDOWN and (evento.key == pygame.K_UP or evento.key == pygame.K_w):
+                move_y = -15
+            elif evento.type == pygame.KEYDOWN and (evento.key == pygame.K_DOWN or evento.key == pygame.K_s):
+                move_y = 15
+                
             elif evento.type == pygame.MOUSEBUTTONUP:
                 if evento.button == 1:
                     mouse_click = pygame.mouse.get_pos()
@@ -344,60 +334,42 @@ def play(nick_name):
         
         
         else:                    
-            spaceship.move_spaceship((move_x, move_y))
-                        
-            
-            ## change spaceship angle
-            mouse_pos = pygame.mouse.get_pos()
-            dx = mouse_pos[0] - spaceship.center[0]
-            dy = mouse_pos[1] - spaceship.center[1]
-            
-            angle_rad = math.atan2(-dy, dx)
-            angle_deg = math.degrees(angle_rad)
-            spaceship_angle =  angle_deg - 90
-            
-            spaceship.set_rotation(spaceship_angle)
-            
-            
             ## increment levels
             count += (1 * difficulty)
             difficulty += 0.005
             if (count >= max_count):
                 count = 0
-                build_asteroid()
-            
+                asteroids.append(Asteroid.build_random())
+                
+                
+            ## configure crosshair
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            crosshair_width, crosshair_height = engine.crosshair.get_size()
+            crosshair_postion = (mouse_x - (crosshair_width / 2), mouse_y - (crosshair_height / 2))
+                
+                
+            ## gameplay logics
+            spaceship.move_spaceship((move_x, move_y))
+            spaceship.calculate_angle_by_mouse(pygame.mouse.get_pos())
             
             ## asteroids logics
             for asteroid in asteroids[:]: 
-                asteroid_x, asteroid_y = asteroid.position
-                asteroid.set_y(asteroid_y + difficulty) 
-                asteroid_y = asteroid.get_y()
+                asteroid.set_y(asteroid.get_y() + difficulty) 
                 
-                
-                ## shoots lasers colision
+                ## shoots lasers colisions
                 for laser in lasers[:]:
-                    rel_x = int(laser.x - asteroid.rect.x)
-                    rel_y = int(laser.y - asteroid.rect.y)
-
-                    if 0 <= rel_x < asteroid.rect.width and 0 <= rel_y < asteroid.rect.height:
-                        mask = pygame.mask.from_surface(asteroid.sprite)
-                        if mask.get_at((rel_x, rel_y)):
-                            asteroids.remove(asteroid)
-                            lasers.remove(laser)
-                            points += 1
-                            pygame.mixer.Sound.play(engine.explosion)
-                            break
-                        
-                
-                ## verify colision with asteroid
-                spaceship_mask, offset = spaceship.get_mask_and_offset(asteroid)
-                asteroid_mask = pygame.mask.from_surface(asteroid.sprite)
-                
-                if spaceship.rect.colliderect(asteroid.rect):
-                    if spaceship_mask.overlap(asteroid_mask, offset):
+                    if asteroid.verify_laser_colision(laser):
+                        asteroids.remove(asteroid)
+                        lasers.remove(laser)
                         pygame.mixer.Sound.play(engine.explosion)
-                        writeData(nick_name, points)
-                        game_over()
+                        points += 1
+                        break
+                        
+                ## asteroids colisions
+                if spaceship.verify_colision(asteroid):
+                    pygame.mixer.Sound.play(engine.explosion)
+                    writeData(nick_name, points)
+                    game_over()
             
             
             ## write points infos 
@@ -410,12 +382,6 @@ def play(nick_name):
             label_width = text_points_width + text_pause_width + 52
             label_point = pygame.Surface((label_width, 35), pygame.SRCALPHA)
             pygame.draw.rect(label_point, engine.black_transparent_2, (0, 0, label_width, 35))
-            
-            
-            ## configure crosshair
-            mouse_x, mouse_y = pygame.mouse.get_pos()
-            crosshair_width, crosshair_height = engine.crosshair.get_size()
-            crosshair_postion = (mouse_x - (crosshair_width / 2), mouse_y - (crosshair_height / 2))
             
             
             ## draw
@@ -433,7 +399,6 @@ def play(nick_name):
             for asteroid in asteroids:
                 engine.window.blit(asteroid.sprite, asteroid.rect)
                 
-                    
             engine.window.blit(label_point, (5, 11))
             engine.window.blit(text_points, (15,15))
             engine.window.blit(text_pause, (text_points_width, 25))

@@ -31,12 +31,6 @@ endgame_background = pygame.transform.smoothscale(pygame.image.load("assets/endg
 background = pygame.transform.smoothscale(pygame.image.load("assets/space.jpeg").convert(), game_resolution)
 
 
-## asteroids
-asteroid_res: Tuple[int, int] = (100, 100)
-asteroids_range_x: Tuple[int, int] = (0, game_resolution[0] - asteroid_res[0])
-init_axle_y: int = -asteroid_res[1]
-asteroids_imgs = ("assets/asteroid1.png", "assets/asteroid2.png")
-
 ## sounds
 musics = { 
     "start_wars_theme": "assets/star_wars_theme.mp3",
