@@ -184,7 +184,7 @@ def welcome(nick_name):
     welcome = f"Seja bem vindo {nick_name}!"
     objective = "Seu objetivo é destruir asteroides e evitar colisões, toda vez que destruí-los será adicinado um ponto ao seu placar."
     gameplay = "Você utilizará as setas (↑ ← ↓ →) ou W A S D do seu teclado para se movimentar."
-    gameplay_2 = "Utilize o seu mouse para clicar sobre os asteroides e destruí-los."
+    gameplay_2 = "Utilize o seu mouse atirar lasers contra os asteroides e destruí-los."
     
     welcomeTxt = engine.font.render(welcome, True, engine.yellow)
     welcomeTxt_width , welcomeTxt_height = welcomeTxt.get_size()
